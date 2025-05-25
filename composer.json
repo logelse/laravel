@@ -1,0 +1,32 @@
+{
+    "name": "logelse/laravel",
+    "description": "Laravel log handler for LogElse API",
+    "type": "library",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "LogElse",
+            "email": "support@logelse.com"
+        }
+    ],
+    "require": {
+        "php": "^7.4|^8.0",
+        "illuminate/support": "^8.0|^9.0|^10.0",
+        "illuminate/log": "^8.0|^9.0|^10.0",
+        "guzzlehttp/guzzle": "^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "LogElse\\": "src/LogElse/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "LogElse\\LogElseServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
