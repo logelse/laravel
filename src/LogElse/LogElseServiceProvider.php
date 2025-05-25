@@ -33,10 +33,16 @@ class LogElseServiceProvider extends ServiceProvider
 
         // Extend Laravel's logging system with our custom driver
         $this->app->make(LogManager::class)->extend('logelse', function ($app, array $config) {
+            // Merge channel config with global config, giving priority to channel config
+            $fullConfig = array_merge(config('logelse', []), $config);
+            
+            // Ensure required fields are present
+            $fullConfig['api_key'] = $fullConfig['api_key'] ?? config('logelse.api_key');
+            $fullConfig['api_url'] = $fullConfig['api_url'] ?? config('logelse.api_url');
+            $fullConfig['app_name'] = $fullConfig['app_name'] ?? config('logelse.app_name');
+            
             $handler = new LogElseHandler(
-                $config['api_key'] ?? config('logelse.api_key'),
-                $config['api_url'] ?? config('logelse.api_url'),
-                $config['app_name'] ?? config('logelse.app_name'),
+                $fullConfig,
                 $config['level'] ?? 'debug'
             );
             

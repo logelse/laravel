@@ -31,4 +31,45 @@ return [
     |
     */
     'app_name' => env('LOGELSE_APP_NAME', env('APP_NAME', 'Laravel')),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Logging Mode
+    |--------------------------------------------------------------------------
+    |
+    | This determines how logs are sent to the LogElse API:
+    | - 'direct': Sends logs immediately via HTTP (synchronous)
+    | - 'queue': Sends logs via Laravel queues (asynchronous)
+    |
+    */
+    'mode' => env('LOGELSE_MODE', 'direct'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Direct Mode Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration options for direct mode logging.
+    |
+    */
+    'direct' => [
+        'timeout' => env('LOGELSE_DIRECT_TIMEOUT', 5),
+        'connect_timeout' => env('LOGELSE_DIRECT_CONNECT_TIMEOUT', 2),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Queue Mode Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration options for queue-based logging.
+    |
+    */
+    'queue' => [
+        'connection' => env('LOGELSE_QUEUE_CONNECTION', 'default'),
+        'queue_name' => env('LOGELSE_QUEUE_NAME', 'logelse'),
+        'delay' => env('LOGELSE_QUEUE_DELAY', 0),
+        'retry_after' => env('LOGELSE_QUEUE_RETRY_AFTER', 60),
+        'max_tries' => env('LOGELSE_QUEUE_MAX_TRIES', 3),
+    ],
 ];

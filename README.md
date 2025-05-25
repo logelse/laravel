@@ -12,7 +12,7 @@ A Laravel package for seamlessly sending application logs to the LogElse API ser
 - 📊 **Multiple Usage Patterns** - Use as default logger, dedicated channel, or in logging stacks
 - 🛡️ **Error Resilient** - Graceful handling of API failures without affecting your application
 - 🔄 **Context Sanitization** - Automatically handles complex data types and sensitive information
-- ⚡ **Performance Optimized** - Asynchronous logging that doesn't block your application
+- ⚡ **Flexible Performance** - Choose between direct (synchronous) or queue-based (asynchronous) logging
 
 ## Requirements
 
@@ -57,7 +57,40 @@ LOGELSE_API_URL=https://your-custom-logelse-api.com/logs
 LOGELSE_APP_NAME=MyAwesomeApp
 ```
 
-### 3. Configure Logging Channel
+### 3. Choose Logging Mode
+
+The package supports two logging modes:
+
+#### Direct Mode (Default)
+Sends logs immediately via HTTP. Simple setup, but blocks request until log is sent.
+
+```env
+LOGELSE_MODE=direct
+LOGELSE_DIRECT_TIMEOUT=5
+LOGELSE_DIRECT_CONNECT_TIMEOUT=2
+```
+
+#### Queue Mode (Recommended for Production)
+Sends logs via Laravel queues for better performance. Requires queue setup.
+
+```env
+LOGELSE_MODE=queue
+LOGELSE_QUEUE_CONNECTION=redis
+LOGELSE_QUEUE_NAME=logelse
+LOGELSE_QUEUE_DELAY=0
+LOGELSE_QUEUE_MAX_TRIES=3
+LOGELSE_QUEUE_RETRY_AFTER=60
+```
+
+**Queue Setup Requirements:**
+```bash
+# Make sure you have a queue worker running
+php artisan queue:work --queue=logelse
+
+# Or use Supervisor for production
+```
+
+### 4. Configure Logging Channel
 
 Add the LogElse channel to your `config/logging.php` file:
 
@@ -69,6 +102,7 @@ Add the LogElse channel to your `config/logging.php` file:
         'driver' => 'logelse',
         'level' => env('LOG_LEVEL', 'debug'),
         // Optional: Override global config for this channel
+        // 'mode' => 'queue', // Override mode for this channel
         // 'api_key' => 'channel-specific-key',
         // 'api_url' => 'https://custom-url.com/logs',
         // 'app_name' => 'ChannelSpecificApp',
@@ -213,8 +247,36 @@ return [
     
     // Application name for log identification
     'app_name' => env('LOGELSE_APP_NAME', env('APP_NAME', 'Laravel')),
+    
+    // Logging mode: 'direct' or 'queue'
+    'mode' => env('LOGELSE_MODE', 'direct'),
+    
+    // Direct mode configuration
+    'direct' => [
+        'timeout' => env('LOGELSE_DIRECT_TIMEOUT', 5),
+        'connect_timeout' => env('LOGELSE_DIRECT_CONNECT_TIMEOUT', 2),
+    ],
+    
+    // Queue mode configuration
+    'queue' => [
+        'connection' => env('LOGELSE_QUEUE_CONNECTION', 'default'),
+        'queue_name' => env('LOGELSE_QUEUE_NAME', 'logelse'),
+        'delay' => env('LOGELSE_QUEUE_DELAY', 0),
+        'retry_after' => env('LOGELSE_QUEUE_RETRY_AFTER', 60),
+        'max_tries' => env('LOGELSE_QUEUE_MAX_TRIES', 3),
+    ],
 ];
 ```
+
+### Mode Comparison
+
+| Feature | Direct Mode | Queue Mode |
+|---------|-------------|------------|
+| **Performance** | Blocks request | Non-blocking |
+| **Setup Complexity** | Simple | Requires queue workers |
+| **Reliability** | Immediate failure | Retry mechanism |
+| **Resource Usage** | Low | Higher (queue storage) |
+| **Best For** | Development, low-traffic | Production, high-traffic |
 
 ## Error Handling
 
@@ -258,8 +320,9 @@ Log::channel('logelse')->info('Test log from ' . config('app.name'), [
 - Verify environment variables are set correctly
 
 **3. Performance concerns**
-- The package uses asynchronous HTTP requests
-- Failed requests are handled gracefully without blocking
+- Use queue mode for better performance in production
+- Direct mode blocks requests until HTTP call completes
+- Failed requests are handled gracefully without crashing your app
 
 ### Debug Mode
 
