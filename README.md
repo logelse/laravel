@@ -75,7 +75,7 @@ Sends logs via Laravel queues for better performance. Requires queue setup.
 
 ```env
 LOGELSE_MODE=queue
-LOGELSE_QUEUE_CONNECTION=redis
+LOGELSE_QUEUE_CONNECTION=database  # or redis if available
 LOGELSE_QUEUE_NAME=logelse
 LOGELSE_QUEUE_DELAY=0
 LOGELSE_QUEUE_MAX_TRIES=3
@@ -84,11 +84,17 @@ LOGELSE_QUEUE_RETRY_AFTER=60
 
 **Queue Setup Requirements:**
 ```bash
+# For database queue (recommended default)
+php artisan queue:table
+php artisan migrate
+
 # Make sure you have a queue worker running
 php artisan queue:work --queue=logelse
 
 # Or use Supervisor for production
 ```
+
+**Automatic Fallback:** If queue mode fails (Redis not available, queue misconfigured, etc.), the package automatically falls back to direct mode to ensure logs are still sent.
 
 ### 4. Configure Logging Channel
 
@@ -259,7 +265,7 @@ return [
     
     // Queue mode configuration
     'queue' => [
-        'connection' => env('LOGELSE_QUEUE_CONNECTION', 'default'),
+        'connection' => env('LOGELSE_QUEUE_CONNECTION', 'database'),
         'queue_name' => env('LOGELSE_QUEUE_NAME', 'logelse'),
         'delay' => env('LOGELSE_QUEUE_DELAY', 0),
         'retry_after' => env('LOGELSE_QUEUE_RETRY_AFTER', 60),

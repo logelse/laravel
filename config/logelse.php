@@ -63,10 +63,12 @@ return [
     |--------------------------------------------------------------------------
     |
     | Configuration options for queue-based logging.
+    | Note: If queue mode fails (Redis not available, etc.), it will
+    | automatically fall back to direct mode to ensure logs are still sent.
     |
     */
     'queue' => [
-        'connection' => env('LOGELSE_QUEUE_CONNECTION', 'default'),
+        'connection' => env('LOGELSE_QUEUE_CONNECTION', 'database'),
         'queue_name' => env('LOGELSE_QUEUE_NAME', 'logelse'),
         'delay' => env('LOGELSE_QUEUE_DELAY', 0),
         'retry_after' => env('LOGELSE_QUEUE_RETRY_AFTER', 60),
