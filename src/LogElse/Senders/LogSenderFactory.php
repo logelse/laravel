@@ -16,28 +16,8 @@ class LogSenderFactory
      */
     public static function create(array $config): AbstractLogSender
     {
-        $mode = $config['mode'] ?? 'direct';
-
-        // Validate queue configuration if queue mode is requested
-        if ($mode === 'queue' && !static::isQueueConfigurationValid($config)) {
-            Log::channel('single')->warning('LogElse queue mode requested but configuration invalid, falling back to direct mode', [
-                'requested_mode' => 'queue',
-                'fallback_mode' => 'direct',
-                'queue_connection' => $config['queue']['connection'] ?? 'default'
-            ]);
-            $mode = 'direct';
-        }
-
-        switch ($mode) {
-            case 'queue':
-                return new QueueLogSender($config);
-            
-            case 'direct':
-                return new DirectLogSender($config);
-            
-            default:
-                throw new InvalidArgumentException("Unsupported LogElse mode: {$mode}. Supported modes are: direct, queue");
-        }
+        // Queue mode is disabled, always use direct mode
+        return new DirectLogSender($config);
     }
 
     /**
@@ -85,7 +65,7 @@ class LogSenderFactory
      */
     public static function getAvailableModes(): array
     {
-        return ['direct', 'queue'];
+        return ['direct'];
     }
 
     /**

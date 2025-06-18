@@ -34,15 +34,26 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Application UUID
+    |--------------------------------------------------------------------------
+    |
+    | This value is the unique identifier of your application. This value is used
+    | to identify your application in the LogElse dashboard.
+    |
+    */
+    'app_uuid' => env('LOGELSE_APP_UUID', 'TEST-1'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Logging Mode
     |--------------------------------------------------------------------------
     |
     | This determines how logs are sent to the LogElse API:
     | - 'direct': Sends logs immediately via HTTP (synchronous)
-    | - 'queue': Sends logs via Laravel queues (asynchronous)
+    | Queue mode is currently disabled.
     |
     */
-    'mode' => env('LOGELSE_MODE', 'direct'),
+    'mode' => 'direct',
 
     /*
     |--------------------------------------------------------------------------

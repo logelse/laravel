@@ -40,7 +40,7 @@ abstract class AbstractLogSender
             'log_level' => strtoupper($record['level_name']),
             'message' => $record['message'],
             'app_name' => $this->config['app_name'],
-            'context' => $this->formatContext($record),
+            'app_uuid' => $this->config['app_uuid'] ?? 'TEST-1',
         ];
     }
 

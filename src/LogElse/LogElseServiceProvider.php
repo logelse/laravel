@@ -40,6 +40,7 @@ class LogElseServiceProvider extends ServiceProvider
             $fullConfig['api_key'] = $fullConfig['api_key'] ?? config('logelse.api_key');
             $fullConfig['api_url'] = $fullConfig['api_url'] ?? config('logelse.api_url');
             $fullConfig['app_name'] = $fullConfig['app_name'] ?? config('logelse.app_name');
+            $fullConfig['app_uuid'] = $fullConfig['app_uuid'] ?? config('logelse.app_uuid');
             
             $handler = new LogElseHandler(
                 $fullConfig,

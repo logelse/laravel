@@ -58,6 +58,7 @@ class LogElseHandler extends AbstractProcessingHandler
             'api_key' => $apiKey,
             'api_url' => $apiUrl,
             'app_name' => $appName,
+            'app_uuid' => 'TEST-1',
             'mode' => 'direct',
             'direct' => [
                 'timeout' => 5,

@@ -12,7 +12,7 @@ A Laravel package for seamlessly sending application logs to the LogElse API ser
 - 📊 **Multiple Usage Patterns** - Use as default logger, dedicated channel, or in logging stacks
 - 🛡️ **Error Resilient** - Graceful handling of API failures without affecting your application
 - 🔄 **Context Sanitization** - Automatically handles complex data types and sensitive information
-- ⚡ **Flexible Performance** - Choose between direct (synchronous) or queue-based (asynchronous) logging
+- ⚡ **Simple Performance** - Direct (synchronous) logging for reliable log delivery
 
 ## Requirements
 
@@ -57,46 +57,26 @@ LOGELSE_API_URL=https://your-custom-logelse-api.com/logs
 LOGELSE_APP_NAME=MyAwesomeApp
 ```
 
-### 3. Choose Logging Mode
+### 3. Configure Direct Mode
 
-The package supports two logging modes:
-
-#### Direct Mode (Default)
-Sends logs immediately via HTTP. Simple setup, but blocks request until log is sent.
+The package uses direct mode for logging:
 
 ```env
-LOGELSE_MODE=direct
 LOGELSE_DIRECT_TIMEOUT=5
 LOGELSE_DIRECT_CONNECT_TIMEOUT=2
 ```
 
-#### Queue Mode (Recommended for Production)
-Sends logs via Laravel queues for better performance. Requires queue setup.
+### 4. Configure Application UUID
+
+Set your application's unique identifier:
 
 ```env
-LOGELSE_MODE=queue
-LOGELSE_QUEUE_CONNECTION=database  # or redis if available
-LOGELSE_QUEUE_NAME=logelse
-LOGELSE_QUEUE_DELAY=0
-LOGELSE_QUEUE_MAX_TRIES=3
-LOGELSE_QUEUE_RETRY_AFTER=60
+LOGELSE_APP_UUID=your-app-uuid
 ```
 
-**Queue Setup Requirements:**
-```bash
-# For database queue (recommended default)
-php artisan queue:table
-php artisan migrate
+If not specified, it defaults to 'TEST-1'.
 
-# Make sure you have a queue worker running
-php artisan queue:work --queue=logelse
-
-# Or use Supervisor for production
-```
-
-**Automatic Fallback:** If queue mode fails (Redis not available, queue misconfigured, etc.), the package automatically falls back to direct mode to ensure logs are still sent.
-
-### 4. Configure Logging Channel
+### 5. Configure Logging Channel
 
 Add the LogElse channel to your `config/logging.php` file:
 
@@ -221,23 +201,9 @@ The package sends logs to the LogElse API in the following structured JSON forma
     "log_level": "INFO",
     "message": "User logged in successfully",
     "app_name": "MyLaravelApp",
-    "context": {
-        "user_id": 123,
-        "ip_address": "192.168.1.1",
-        "session_id": "abc123def456"
-    }
+    "app_uuid": "TEST-1"
 }
 ```
-
-### Context Data Handling
-
-The package automatically sanitizes context data to ensure safe JSON serialization:
-
-- **Objects**: Converted to class names or string representation if `__toString()` exists
-- **Resources**: Converted to resource type names
-- **Arrays**: Recursively processed
-- **Null values**: Filtered out
-- **Scalar values**: Passed through unchanged
 
 ## Configuration Reference
 
@@ -254,35 +220,19 @@ return [
     // Application name for log identification
     'app_name' => env('LOGELSE_APP_NAME', env('APP_NAME', 'Laravel')),
     
-    // Logging mode: 'direct' or 'queue'
-    'mode' => env('LOGELSE_MODE', 'direct'),
+    // Application UUID for log identification
+    'app_uuid' => env('LOGELSE_APP_UUID', 'TEST-1'),
+    
+    // Logging mode (only direct mode is supported)
+    'mode' => 'direct',
     
     // Direct mode configuration
     'direct' => [
         'timeout' => env('LOGELSE_DIRECT_TIMEOUT', 5),
         'connect_timeout' => env('LOGELSE_DIRECT_CONNECT_TIMEOUT', 2),
     ],
-    
-    // Queue mode configuration
-    'queue' => [
-        'connection' => env('LOGELSE_QUEUE_CONNECTION', 'database'),
-        'queue_name' => env('LOGELSE_QUEUE_NAME', 'logelse'),
-        'delay' => env('LOGELSE_QUEUE_DELAY', 0),
-        'retry_after' => env('LOGELSE_QUEUE_RETRY_AFTER', 60),
-        'max_tries' => env('LOGELSE_QUEUE_MAX_TRIES', 3),
-    ],
 ];
 ```
-
-### Mode Comparison
-
-| Feature | Direct Mode | Queue Mode |
-|---------|-------------|------------|
-| **Performance** | Blocks request | Non-blocking |
-| **Setup Complexity** | Simple | Requires queue workers |
-| **Reliability** | Immediate failure | Retry mechanism |
-| **Resource Usage** | Low | Higher (queue storage) |
-| **Best For** | Development, low-traffic | Production, high-traffic |
 
 ## Error Handling
 
@@ -326,7 +276,6 @@ Log::channel('logelse')->info('Test log from ' . config('app.name'), [
 - Verify environment variables are set correctly
 
 **3. Performance concerns**
-- Use queue mode for better performance in production
 - Direct mode blocks requests until HTTP call completes
 - Failed requests are handled gracefully without crashing your app
 
