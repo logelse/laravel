@@ -50,8 +50,7 @@ Configure the package by adding these environment variables to your `.env` file:
 # Required: Your LogElse API key
 LOGELSE_API_KEY=your-api-key-here
 
-# Optional: Custom API URL (uses default if not specified)
-LOGELSE_API_URL=https://your-custom-logelse-api.com/logs
+# The LogElse API URL is hardcoded to https://ingst.logelse.com/logs
 
 # Optional: Custom application name (uses APP_NAME if not specified)
 LOGELSE_APP_NAME=MyAwesomeApp
@@ -214,8 +213,8 @@ return [
     // LogElse API key for authentication
     'api_key' => env('LOGELSE_API_KEY', 'your-default-key'),
     
-    // LogElse API endpoint URL
-    'api_url' => env('LOGELSE_API_URL', 'https://api.logelse.com/logs'),
+    // LogElse API endpoint URL (hardcoded)
+    'api_url' => 'https://ingst.logelse.com/logs',
     
     // Application name for log identification
     'app_name' => env('LOGELSE_APP_NAME', env('APP_NAME', 'Laravel')),

@@ -19,7 +19,7 @@ return [
     | This is the URL of the LogElse API.
     |
     */
-    'api_url' => env('LOGELSE_API_URL', 'https://ingst.logelse.com/logs'),
+    'api_url' => 'https://ingst.logelse.com/logs',
 
     /*
     |--------------------------------------------------------------------------
